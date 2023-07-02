@@ -17,6 +17,7 @@ locals {
   ec2_instance_type          = local.ec2.ec2_instance_type
   ec2_vpc_security_group_ids = local.ec2.ec2_vpc_security_group_ids
   ec2_subnet_id              = local.ec2.ec2_subnet_id
+  ec2_hostname               = local.ec2.ec2_hostname
 }
 
 remote_state {
@@ -52,6 +53,7 @@ EOF
 }
 
 inputs = {
+  ec2_hostname               = local.ec2_hostname
   ec2_instance_type          = local.ec2_instance_type
   ec2_vpc_security_group_ids = local.ec2_vpc_security_group_ids
   ec2_subnet_id              = local.ec2_subnet_id
