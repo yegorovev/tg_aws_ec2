@@ -13,11 +13,15 @@ locals {
   key         = join("/", [local.common.key, "ec2/terraform.tfstate"])
   common_tags = jsonencode(local.common.tags)
 
-  ec2                        = read_terragrunt_config(find_in_parent_folders("common.hcl")).es2
+  ec2        = read_terragrunt_config(find_in_parent_folders("common.hcl")).es2
+  ec2_ami_id = try(local.ec2.ec2_instance_type, "")
+
   ec2_instance_type          = local.ec2.ec2_instance_type
+  ec2_hostname               = local.ec2.ec2_hostname
+  ec2_key_name               = try(local.ec2.ec2_key_name, "")
   ec2_vpc_security_group_ids = local.ec2.ec2_vpc_security_group_ids
   ec2_subnet_id              = local.ec2.ec2_subnet_id
-  ec2_hostname               = local.ec2.ec2_hostname
+  ec2_monitoring             = try(local.ec2.ec2_monitoring, false)
 }
 
 remote_state {
@@ -53,8 +57,11 @@ EOF
 }
 
 inputs = {
-  ec2_hostname               = local.ec2_hostname
+  env                        = local.env
+  ec2_ami_id                 = local.ec2_ami_id
   ec2_instance_type          = local.ec2_instance_type
+  ec2_hostname               = local.ec2_hostname
+  ec2_key_name               = local.ec2_ami_id
   ec2_vpc_security_group_ids = local.ec2_vpc_security_group_ids
   ec2_subnet_id              = local.ec2_subnet_id
 }
