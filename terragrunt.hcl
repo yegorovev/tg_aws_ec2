@@ -13,7 +13,7 @@ locals {
   key         = join("/", [local.common.key, "ec2/terraform.tfstate"])
   common_tags = jsonencode(local.common.tags)
 
-  ec2        = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.es2
+  ec2        = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.ec2
   ec2_ami_id = try(local.ec2.ec2_instance_type, "")
 
   ec2_instance_type          = local.ec2.ec2_instance_type
