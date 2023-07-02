@@ -1,5 +1,5 @@
 terraform {
-  source = "github.com/yegorovev/tf_aws_es2.git"
+  source = "github.com/yegorovev/tf_aws_instance.git"
 }
 
 
