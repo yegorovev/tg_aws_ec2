@@ -4,23 +4,30 @@ terraform {
 
 
 locals {
-  common      = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.common
-  env         = local.common.env
-  profile     = local.common.profile
-  region      = local.common.region
-  bucket_name = local.common.bucket_name
-  lock_table  = local.common.lock_table
-  key         = join("/", [local.common.key, "ec2/terraform.tfstate"])
+  common  = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.common
+  env     = local.common.env
+  profile = local.common.profile
+  region  = local.common.region
+
   common_tags = jsonencode(local.common.tags)
 
-  ec2                        = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.ec2
-  ec2_ami_id                 = try(local.ec2.ec2_ami_id, "")
-  ec2_instance_type          = local.ec2.ec2_instance_type
-  ec2_hostname               = local.ec2.ec2_hostname
-  ec2_key_name               = try(local.ec2.ec2_key_name, "")
-  ec2_vpc_security_group_ids = local.ec2.ec2_vpc_security_group_ids
-  ec2_subnet_id              = local.ec2.ec2_subnet_id
-  ec2_monitoring             = try(local.ec2.ec2_monitoring, false)
+  net                     = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.net
+  net_backet_remote_state = local.net.net_backet_remote_state
+  net_key_remote_state    = local.net.net_key_remote_state
+  net_remote_state_region = local.net.net_remote_state_region
+
+  ec2                         = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.ec2
+  ec2_lock_table_remote_state = local.ec2.ec2_lock_table_remote_state
+  ec2_key_remote_state        = local.ec2.ec2_key_remote_state
+  ec2_backet_remote_state     = local.ec2.ec2_backet_remote_state
+  ec2_ami_id                  = try(local.ec2.ec2_ami_id, "")
+  ec2_default_ami             = local.ec2.ec2_default_ami
+  ec2_instance_type           = local.ec2.ec2_instance_type
+  ec2_hostname                = local.ec2.ec2_hostname
+  ec2_key_name                = try(local.ec2.ec2_key_name, "")
+  ec2_vpc_security_groups     = local.ec2.ec2_vpc_security_groups
+  ec2_subnet_name             = local.ec2.ec2_subnet_name
+  ec2_monitoring              = try(local.ec2.ec2_monitoring, false)
 }
 
 remote_state {
@@ -30,11 +37,11 @@ remote_state {
     if_exists = "overwrite_terragrunt"
   }
   config = {
-    bucket         = local.bucket_name
-    key            = local.key
+    bucket         = local.ec2_backet_remote_state
+    key            = local.ec2_key_remote_state
     region         = local.region
     encrypt        = true
-    dynamodb_table = local.lock_table
+    dynamodb_table = local.ec2_lock_table_remote_state
   }
 }
 
@@ -56,11 +63,16 @@ EOF
 }
 
 inputs = {
-  env                        = local.env
-  ec2_ami_id                 = local.ec2_ami_id
-  ec2_instance_type          = local.ec2_instance_type
-  ec2_hostname               = local.ec2_hostname
-  ec2_key_name               = local.ec2_key_name
-  ec2_vpc_security_group_ids = local.ec2_vpc_security_group_ids
-  ec2_subnet_id              = local.ec2_subnet_id
+  net_backet_remote_state = local.net_backet_remote_state
+  net_key_remote_state    = local.net_key_remote_state
+  net_remote_state_region = local.net_remote_state_region
+
+  env                     = local.env
+  ec2_ami_id              = local.ec2_ami_id
+  ec2_default_ami         = local.ec2_default_ami
+  ec2_instance_type       = local.ec2_instance_type
+  ec2_hostname            = local.ec2_hostname
+  ec2_key_name            = local.ec2_key_name
+  ec2_vpc_security_groups = local.ec2_vpc_security_groups
+  ec2_subnet_name         = local.ec2_subnet_name
 }
