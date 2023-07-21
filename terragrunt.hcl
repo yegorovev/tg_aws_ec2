@@ -4,30 +4,32 @@ terraform {
 
 
 locals {
-  common  = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.common
-  env     = local.common.env
-  profile = local.common.profile
-  region  = local.common.region
+  parameters_file = get_env("TG_PARAMS_FILE", "common_default.hcl")
+  common          = read_terragrunt_config(find_in_parent_folders(local.parameters_file)).inputs.common
+  env             = local.common.env
+  profile         = local.common.profile
+  region          = local.common.region
 
   common_tags = jsonencode(local.common.tags)
 
-  net                     = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.net
+  net                     = read_terragrunt_config(find_in_parent_folders(local.parameters_file)).inputs.net
   net_backet_remote_state = local.net.net_backet_remote_state
   net_key_remote_state    = local.net.net_key_remote_state
   net_remote_state_region = local.net.net_remote_state_region
 
-  ec2                         = read_terragrunt_config(find_in_parent_folders("common.hcl")).inputs.ec2
+  ec2                         = read_terragrunt_config(find_in_parent_folders(local.parameters_file)).inputs.ec2
   ec2_lock_table_remote_state = local.ec2.ec2_lock_table_remote_state
   ec2_key_remote_state        = local.ec2.ec2_key_remote_state
   ec2_backet_remote_state     = local.ec2.ec2_backet_remote_state
   ec2_ami_id                  = try(local.ec2.ec2_ami_id, "")
-  ec2_default_ami             = local.ec2.ec2_default_ami
+  ec2_default_ami             = try(local.ec2.ec2_default_ami, "")
   ec2_instance_type           = local.ec2.ec2_instance_type
   ec2_hostname                = local.ec2.ec2_hostname
   ec2_key_name                = try(local.ec2.ec2_key_name, "")
   ec2_vpc_security_groups     = local.ec2.ec2_vpc_security_groups
   ec2_subnet_name             = local.ec2.ec2_subnet_name
   ec2_monitoring              = try(local.ec2.ec2_monitoring, false)
+  ec2_source_dest_check       = try(local.ec2.ec2_source_dest_check, true)
 }
 
 remote_state {
@@ -75,4 +77,5 @@ inputs = {
   ec2_key_name            = local.ec2_key_name
   ec2_vpc_security_groups = local.ec2_vpc_security_groups
   ec2_subnet_name         = local.ec2_subnet_name
+  ec2_source_dest_check   = local.ec2_source_dest_check
 }
