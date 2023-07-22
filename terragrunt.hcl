@@ -1,5 +1,5 @@
 terraform {
-  source = "github.com/yegorovev/tf_aws_instance.git"
+  source = "git@github.com:yegorovev/tf_aws_instance.git?ref=v1.0.0"
 }
 
 
@@ -30,6 +30,11 @@ locals {
   ec2_subnet_name             = local.ec2.ec2_subnet_name
   ec2_monitoring              = try(local.ec2.ec2_monitoring, false)
   ec2_source_dest_check       = try(local.ec2.ec2_source_dest_check, true)
+
+  ### Route VM
+  rt_name                = try(local.ec2.rt_name, null)
+  destination_cidr_block = try(local.ec2.destination_cidr_block, null)
+
 }
 
 remote_state {
@@ -78,4 +83,7 @@ inputs = {
   ec2_vpc_security_groups = local.ec2_vpc_security_groups
   ec2_subnet_name         = local.ec2_subnet_name
   ec2_source_dest_check   = local.ec2_source_dest_check
+
+  rt_name                = local.rt_name
+  destination_cidr_block = local.destination_cidr_block
 }
